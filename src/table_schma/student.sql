@@ -10,6 +10,9 @@ SELECT * FROM student;
 SELECT * FROM "STUDENT";
 CREATE SEQUENCE m_mid INCREMENT by 1 START WITH 1 NOCYCLE NOCACHE;
 
+DROP SEQUENCE m_mid;
+
+
 INSERT INTO student
 VALUES (m_mid.nextval, '민들래', 90, 88, 75);
 

@@ -4,33 +4,40 @@ import com.edu.dao.StudentDAO;
 import com.edu.entity.Student;
 import com.edu.view.StudentView;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class StudentController {
-    StudentDAO dao;
+    private final StudentDAO dao;
+    private final StudentView view;
 
-    StudentView view;
+    private final String ERROR_MESSAGE = "입력값에 오류가 있습니다.\n";
+    private final int MAX_SCORE = 100;
+    private final int MIN_SCORE = 0;
 
     public StudentController() {
         this.dao = new StudentDAO();
         this.view = new StudentView();
     }
 
-    public String insertStudent(Student ob) {
-        if (!(ob.getKor() >= 0 && ob.getKor() <= 100)) {
-            return "입력값에 오류가 있습니다.";
+    public void insertStudent(Student ob) {
+        if (!(ob.getKor() >= MIN_SCORE && ob.getKor() <= MAX_SCORE)) {
+            System.out.println(ERROR_MESSAGE);
+            return;
         }
-        if (!(ob.getEng() >= 0 && ob.getEng() <= 100)) {
-            return "입력값에 오류가 있습니다.";
+        if (!(ob.getEng() >= MIN_SCORE && ob.getEng() <= MAX_SCORE)) {
+            System.out.println(ERROR_MESSAGE);
+            return;
         }
-        if (!(ob.getMat() >= 0 && ob.getMat() <= 100)) {
-            return "입력값에 오류가 있습니다.";
+        if (!(ob.getMat() >= MIN_SCORE && ob.getMat() <= MAX_SCORE)) {
+            System.out.println(ERROR_MESSAGE);
+            return;
         }
 
-        dao.insertStudent(ob);
+        int n = dao.insertStudent(ob);
+        view.insertStudent(n, ob.getName());
 
-
-        return null;
     }
 
 
@@ -38,16 +45,43 @@ public class StudentController {
         StudentDAO dao = new StudentDAO();
         List<Student> list = dao.getStudentList();
 
+        list = rankCalculator(list);
+
         StudentView view = new StudentView();
         view.getStudentList(list);
     }
 
-    public void getStudent(String name) {
+    private List<Student> rankCalculator(List<Student> list) {
+        List<Integer> scoreList = new ArrayList<>();
 
+        for (int i = 0; i < list.size(); i++) {
+            scoreList.add(list.get(i).getTot());
+        }
+
+        Collections.sort(scoreList, Collections.reverseOrder());
+
+        for (int i = 0; i < scoreList.size(); i++) {
+            int score = scoreList.get(i);
+
+            for (int j = 0; j < list.size(); j++) {
+                if (score == list.get(j).getTot()) {
+                    list.get(j).setRank(i + 1);
+                    break;
+                }
+            }
+        }
+
+        return list;
+    }
+
+    public void getStudent(String name) {
+        Student student = dao.getStudent(name);
+        view.getStudent(student);
     }
 
     public void deleteStudent(String name) {
-
+        int n = dao.deleteStudent(name);
+        view.deleteStudent(n, name);
     }
 
 

@@ -8,22 +8,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static common.JdbcTemplate.*;
 
 public class StudentDAO {
 
+    private Connection conn;
+    private PreparedStatement pstmt;
+    private ResultSet rs;
+    private int n;
+
+    private void setup() {
+        this.conn = getConnection();
+        this.pstmt = null;
+        this.rs = null;
+        this.n = 0;
+    }
+
+    private void setClose() {
+        close(conn);
+        close(pstmt);
+        close(rs);
+    }
+
     public List<Student> getStudentList() {
         List<Student> list = new ArrayList<>();
+        setup();
 
-        Connection conn = getConnection();
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-
-        String sql = "SELECT * FROM STUDENT";
-        System.out.println(sql);
+        String sql = "SELECT * FROM student";
 
         try {
             pstmt = conn.prepareStatement(sql);
@@ -32,7 +45,7 @@ public class StudentDAO {
 
             while (rs.next()) {
                 Student student = new Student();
-                System.out.println(rs.getString("name"));
+                student.setMid(rs.getInt("mid"));
                 student.setName(rs.getString("name"));
                 student.setKor(rs.getInt("kor"));
                 student.setEng(rs.getInt("eng"));
@@ -43,24 +56,47 @@ public class StudentDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            setClose();
         }
-        // 전체 보기
+
         return list;
     }
 
     public Student getStudent(String name) {
-        // 찾기
-        return null;
+        Student student = null;
+
+        setup();
+
+        String sql = "SELECT * FROM student WHERE name=?";
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                student = new Student();
+                student.setMid(rs.getInt("mid"));
+                student.setName(rs.getString("name"));
+                student.setKor(rs.getInt("kor"));
+                student.setEng(rs.getInt("Eng"));
+                student.setMat(rs.getInt("Mat"));
+            }
+
+        } catch (SQLException e) {
+            student = null;
+        } finally {
+            setClose();
+        }
+
+        return student;
     }
 
     public int insertStudent(Student ob) {
-        // 추가
-        int n = 0;
+        setup();
 
-        Connection conn = getConnection();
-        PreparedStatement pstmt = null;
-
-        String sql = "INSERT INTO student VALUES(m_mid.nextval,name=?,kor=?,eng=?,mat=?)";
+        String sql = "INSERT INTO student VALUES(m_mid.nextval, ?, ?, ?, ?)";
 
         try {
             pstmt = conn.prepareStatement(sql);
@@ -77,14 +113,36 @@ public class StudentDAO {
         } catch (SQLException e) {
             rollback(conn);
             n = 0;
+        } finally {
+            setClose();
         }
 
         return n;
     }
 
     public int deleteStudent(String name) {
-        // 삭제
-        return 0;
+        setup();
+
+        String sql = "DELETE FROM student WHERE name=?";
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+
+            n = pstmt.executeUpdate();
+
+            if (n > 0) {
+                commit(conn);
+            }
+
+        } catch (SQLException e) {
+            rollback(conn);
+            n = 0;
+        } finally {
+            setClose();
+        }
+
+        return n;
     }
 
 }

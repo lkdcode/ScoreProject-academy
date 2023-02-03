@@ -31,21 +31,25 @@ public class StudentMain {
 
                 case 1:
                     //추가
-                    System.out.println("이름 : ");
-                    name = sc.nextLine();
-                    System.out.println("국어 : ");
+                    System.out.print("이름 : ");
+                    name = sc.next();
+                    System.out.print("국어 : ");
                     kor = sc.nextInt();
-                    System.out.println("영어 : ");
+                    System.out.print("영어 : ");
                     eng = sc.nextInt();
-                    System.out.println("수학 : ");
+                    System.out.print("수학 : ");
                     mat = sc.nextInt();
+                    Student student = new Student(name, kor, eng, mat);
 
+                    controller.insertStudent(student);
 
                     break;
 
                 case 2:
                     //삭제
-
+                    System.out.print("삭제할 사람 : ");
+                    name = sc.next();
+                    controller.deleteStudent(name);
 
                     break;
                 case 3:
@@ -55,7 +59,10 @@ public class StudentMain {
                     break;
                 case 4:
                     //찾기
+                    System.out.print("찾는 사람 : ");
+                    name = sc.next();
 
+                    controller.getStudent(name);
 
                     break;
                 case 5:

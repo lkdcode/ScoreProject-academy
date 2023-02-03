@@ -20,32 +20,46 @@ public class Student {
         this.rank = rank;
     }
 
+    public Student(String name, int kor, int eng, int mat) {
+        this.name = name;
+        this.kor = kor;
+        this.eng = eng;
+        this.mat = mat;
+    }
+
     public int getTot() {
-        return 0;
+        return kor + eng + mat;
     }
 
     public double getAvg() {
-        return 0;
+        return getTot() / 3.0;
     }
 
     public char getGrade() {
-        return 0;
+        char grade = 'F';
+        if (getAvg() >= 90) {
+            grade = 'A';
+        } else if (getAvg() >= 80) {
+            grade = 'B';
+        } else if (getAvg() >= 70) {
+            grade = 'C';
+        } else if (getAvg() >= 60) {
+            grade = 'D';
+        }
+        return grade;
     }
 
     public String getResult() {
-        return null;
+        if (getGrade() == 'F') {
+            return "불합격";
+        }
+        return "합격";
     }
 
     @Override
     public String toString() {
-        return "Student{" +
-                "mid=" + mid +
-                ", name='" + name + '\'' +
-                ", kor=" + kor +
-                ", eng=" + eng +
-                ", mat=" + mat +
-                ", rank=" + rank +
-                '}';
+        return name + "의 총점은 " + getTot() + "점이고 평균은 " + String.format("%.2f", getAvg()) + "점입니다.\n" +
+                "학점은 " + getGrade() + "이고 결과는 " + getResult() + "입니다.\n";
     }
 
     public int getMid() {
